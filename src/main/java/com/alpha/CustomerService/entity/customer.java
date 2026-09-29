@@ -14,15 +14,18 @@ public class customer {
 	private long mobile;
 	private String gender;
 	private int otp;
-	public customer(String name, long mobile, String gender, int otp) {
+	private String email;
+	public customer(String name, long mobile, String gender, int otp, String email) {
 		super();
 		this.name = name;
 		this.mobile = mobile;
 		this.gender = gender;
 		this.otp = otp;
+		this.email = email;
 	}
 	public customer() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
 	public int getId() {
 		return id;
@@ -54,10 +57,11 @@ public class customer {
 	public void setOtp(int otp) {
 		this.otp = otp;
 	}
-	@Override
-	public String toString() {
-		return "customer [id=" + id + ", name=" + name + ", mobile=" + mobile + ", gender=" + gender + ", otp=" + otp
-				+ "]";
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

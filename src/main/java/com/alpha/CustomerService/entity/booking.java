@@ -122,10 +122,4 @@ public class booking {
 				+ paymentType + ", vehicleType=" + vehicleType + ", bookingDate=" + bookingDate + ", bookingTime="
 				+ bookingTime + ", pickupTime=" + pickupTime + ", dropTime=" + dropTime + ", fare=" + fare + "]";
 	}
-	
-	
-	
-	
-	
-
 }
