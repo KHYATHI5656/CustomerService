@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alpha.CustomerService.dto.SearchDestinationLocationDto;
 import com.alpha.CustomerService.dto.SelectRideDto;
 import com.alpha.CustomerService.dto.SelectRideResponseDto;
+import com.alpha.CustomerService.dto.TemporaryRideDto;
 import com.alpha.CustomerService.dto.customerdto;
+import com.alpha.CustomerService.entity.booking;
 import com.alpha.CustomerService.entity.customer;
 import com.alpha.CustomerService.service.customerservice;
 
@@ -39,9 +41,21 @@ public class customercontroller {
 		public List<SearchDestinationLocationDto> searchPlace(@RequestParam String searchKey) {
 			return customerService.searchPlace(searchKey);
 		}
+		//SelectRide
 		@PostMapping("/customer/selectRide")
 		public SelectRideResponseDto selectRide(@RequestBody SelectRideDto dto) {
 		    return customerService.selectRide(dto);
 		}
+		 @PostMapping("/customer/confirmRide")
+		  public booking confirmRide(@RequestParam int customerId) {
+			 return customerService.confirmRide(customerId);
+		    }
+		 @PostMapping("/customer/saveTemporaryRide")
+		 public String saveTemporaryRide(@RequestBody TemporaryRideDto dto) {
+
+		     customerService.saveTemporaryRide(dto);
+
+		     return "Temporary ride saved successfully";
+		 }
 
 }

@@ -1,5 +1,7 @@
 package com.alpha.CustomerService.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.alpha.CustomerService.dto.CoordinateDto;
+import com.alpha.CustomerService.dto.NearbyRiderDto;
+import com.alpha.CustomerService.dto.NearbyRiderResponseDto;
 import com.alpha.CustomerService.dto.RideOptionDto;
 import com.alpha.CustomerService.dto.SearchDestinationLocationDto;
 import com.alpha.CustomerService.dto.SelectRideDto;
 import com.alpha.CustomerService.dto.SelectRideResponseDto;
+import com.alpha.CustomerService.dto.TemporaryRideDto;
 import com.alpha.CustomerService.dto.customerdto;
+import com.alpha.CustomerService.entity.booking;
 import com.alpha.CustomerService.entity.customer;
+import com.alpha.CustomerService.repository.bookingrepo;
 import com.alpha.CustomerService.repository.customerrepo;
+import java.util.UUID;
 
 @Service
 public class customerservice {
@@ -24,6 +32,12 @@ public class customerservice {
 	private customerrepo customerRepo;
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private bookingrepo bookingRepo;
+
+	@Autowired
+	private redisservice redisService;
 	//create customer
 	public customer createcustomer(customerdto dto) {
 		customer cust=new customer();
@@ -113,5 +127,88 @@ public class customerservice {
 
 	    // Return response
 	    return new SelectRideResponseDto( distanceInKm, rides);
+	}
+	
+	public booking confirmRide(int customerId) {
+
+	    TemporaryRideDto ride = redisService.getTemporaryRide(customerId);
+
+	    if (ride == null) {
+	        throw new RuntimeException("No temporary ride found for customer: " + customerId);
+	    }
+
+	    booking book = new booking();
+	    book.setIdempotencyId(UUID.randomUUID().toString());
+
+	    book.setCustomerId(customerId);
+	    
+	    book.setSourceLatitude(ride.getSourceLatitude());
+	    book.setSourceLongitude(ride.getSourceLongitude());
+
+	    book.setDestinationLatitude(ride.getDestinationLatitude());
+	    book.setDestinationLongitude(ride.getDestinationLongitude());
+
+	    book.setSourceLocation(ride.getSourceLocation());
+	    book.setDestinationLocation(ride.getDestinationLocation());
+
+	    book.setRiderId(ride.getRiderId());
+	    book.setPaymentType(ride.getPaymentType());
+	    book.setVehicleType(ride.getVehicleType());
+	    book.setFare(ride.getFare());
+
+	    book.setBookingDate(LocalDate.now());
+	    book.setBookingTime(LocalTime.now());
+
+	    book.setStatus("CONFIRMED");
+
+	    booking savedBooking = bookingRepo.save(book);
+
+	    redisService.deleteTemporaryRide(customerId);
+
+	    return savedBooking;
+	}
+
+	public int findNearbyRider(double latitude, double longitude, String vehicleType) {
+
+	    NearbyRiderDto request = new NearbyRiderDto(
+	            latitude,
+	            longitude,
+	            vehicleType,
+	            5
+	    );
+
+	    String url = "http://localhost:8083/rider/nearby";
+
+	    NearbyRiderResponseDto response =
+	            restTemplate.postForObject(
+	                    url,
+	                    request,
+	                    NearbyRiderResponseDto.class
+	            );
+
+	    if (response == null ||
+	            response.getRiders() == null ||
+	            response.getRiders().isEmpty()) {
+
+	        throw new RuntimeException("No nearby rider found");
+	    }
+
+	    return Integer.parseInt(response.getRiders().get(0));
+	}
+
+	public void saveTemporaryRide(TemporaryRideDto dto) {
+
+	    int riderId = findNearbyRider(
+	            dto.getSourceLatitude(),
+	            dto.getSourceLongitude(),
+	            dto.getVehicleType()
+	    );
+
+	    dto.setRiderId(riderId);
+
+	    redisService.saveTemporaryRide(
+	            dto.getCustomerId(),
+	            dto
+	    );
 	}
 }
