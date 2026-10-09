@@ -211,4 +211,10 @@ public class customerservice {
 	            dto
 	    );
 	}
+	public booking getBookingById(int bookingId) {
+
+	    return bookingRepo.findById(bookingId)
+	            .orElseThrow(() ->
+	                new RuntimeException("Booking not found: " + bookingId));
+	}
 }
