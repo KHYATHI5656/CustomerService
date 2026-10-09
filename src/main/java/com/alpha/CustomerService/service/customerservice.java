@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,8 +159,12 @@ public class customerservice {
 
 	    book.setBookingDate(LocalDate.now());
 	    book.setBookingTime(LocalTime.now());
+	    String otp = String.valueOf((int)(Math.random() * 9000) + 1000);
+	    book.setOtp(otp);
 
 	    book.setStatus("CONFIRMED");
+	    book.setRiderStatus("PENDING");
+	    book.setPlatformStatus("CONFIRMED");
 
 	    booking savedBooking = bookingRepo.save(book);
 
@@ -211,10 +216,48 @@ public class customerservice {
 	            dto
 	    );
 	}
+
 	public booking getBookingById(int bookingId) {
 
 	    return bookingRepo.findById(bookingId)
 	            .orElseThrow(() ->
 	                new RuntimeException("Booking not found: " + bookingId));
+	}
+	public String cancelRide(int bookingId) {
+
+	    Optional<booking> optionalBooking = bookingRepo.findById(bookingId);
+
+	    if (optionalBooking.isEmpty()) {
+	        return "Booking not found";
+	    }
+
+	    booking ride = optionalBooking.get();
+
+	    if (ride.getStatus().equals("CONFIRMED")) {
+
+	        ride.setStatus("CANCELLED");
+	        ride.setRiderStatus("CANCELLED");
+	        ride.setPlatformStatus("CANCELLED");
+	        
+
+	        bookingRepo.save(ride);
+
+	        return "Ride cancelled successfully";
+	    }
+
+	    if (ride.getStatus().equals("STARTED")) {
+	        return "Ride cannot be cancelled because it has already started";
+	    }
+
+	    return "Ride cannot be cancelled in the current status";
+	}
+	public List<booking> rideHistory(int customerId, String status) {
+
+	    if (status.equalsIgnoreCase("all")) {
+	        return bookingRepo.findByCustomerId(customerId);
+	    }
+
+	    return bookingRepo.findByCustomerIdAndStatus(customerId, status);
+
 	}
 }

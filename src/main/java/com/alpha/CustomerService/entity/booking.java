@@ -15,7 +15,7 @@ public class booking {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String idempotencyId;
     private int customerId;
 
@@ -43,51 +43,44 @@ public class booking {
     private LocalTime dropTime;
 
     private double fare;
+    private String otp;
 
     private String status;
+    private String riderStatus;
+    private String platformStatus;
 
     public booking() {
         super();
     }
+    public booking(String idempotencyId, int customerId, double sourceLatitude, double sourceLongitude,
+			double destinationLatitude, double destinationLongitude, String sourceLocation, String destinationLocation,
+			int riderId, String paymentType, String vehicleType, LocalDate bookingDate, LocalTime bookingTime,
+			LocalTime pickupTime, LocalTime dropTime, double fare, String status, String riderStatus,
+			String platformStatus,String otp) {
+		super();
+		this.idempotencyId = idempotencyId;
+		this.customerId = customerId;
+		this.sourceLatitude = sourceLatitude;
+		this.sourceLongitude = sourceLongitude;
+		this.destinationLatitude = destinationLatitude;
+		this.destinationLongitude = destinationLongitude;
+		this.sourceLocation = sourceLocation;
+		this.destinationLocation = destinationLocation;
+		this.riderId = riderId;
+		this.paymentType = paymentType;
+		this.vehicleType = vehicleType;
+		this.bookingDate = bookingDate;
+		this.bookingTime = bookingTime;
+		this.pickupTime = pickupTime;
+		this.dropTime = dropTime;
+		this.fare = fare;
+		this.status = status;
+		this.riderStatus = riderStatus;
+		this.platformStatus = platformStatus;
+		this.otp=otp;
+	}
 
-    public booking(
-            int customerId,
-            double sourceLatitude,
-            double sourceLongitude,
-            double destinationLatitude,
-            double destinationLongitude,
-            String sourceLocation,
-            String destinationLocation,
-            int riderId,
-            String paymentType,
-            String vehicleType,
-            LocalDate bookingDate,
-            LocalTime bookingTime,
-            LocalTime pickupTime,
-            LocalTime dropTime,
-            double fare,
-            String status) {
-
-        super();
-        this.customerId = customerId;
-        this.sourceLatitude = sourceLatitude;
-        this.sourceLongitude = sourceLongitude;
-        this.destinationLatitude = destinationLatitude;
-        this.destinationLongitude = destinationLongitude;
-        this.sourceLocation = sourceLocation;
-        this.destinationLocation = destinationLocation;
-        this.riderId = riderId;
-        this.paymentType = paymentType;
-        this.vehicleType = vehicleType;
-        this.bookingDate = bookingDate;
-        this.bookingTime = bookingTime;
-        this.pickupTime = pickupTime;
-        this.dropTime = dropTime;
-        this.fare = fare;
-        this.status = status;
-    }
-
-    public int getId() {
+	public int getId() {
         return id;
     }
 
@@ -229,26 +222,26 @@ public class booking {
     public void setIdempotencyId(String idempotencyId) {
         this.idempotencyId = idempotencyId;
     }
+    public String getRiderStatus() {
+        return riderStatus;
+    }
 
-    @Override
-    public String toString() {
-        return "booking [id=" + id
-                + ", customerId=" + customerId
-                + ", sourceLatitude=" + sourceLatitude
-                + ", sourceLongitude=" + sourceLongitude
-                + ", destinationLatitude=" + destinationLatitude
-                + ", destinationLongitude=" + destinationLongitude
-                + ", sourceLocation=" + sourceLocation
-                + ", destinationLocation=" + destinationLocation
-                + ", riderId=" + riderId
-                + ", paymentType=" + paymentType
-                + ", vehicleType=" + vehicleType
-                + ", bookingDate=" + bookingDate
-                + ", bookingTime=" + bookingTime
-                + ", pickupTime=" + pickupTime
-                + ", dropTime=" + dropTime
-                + ", fare=" + fare
-                + ", status=" + status
-                + "]";
+    public void setRiderStatus(String riderStatus) {
+        this.riderStatus = riderStatus;
+    }
+
+    public String getPlatformStatus() {
+        return platformStatus;
+    }
+
+    public void setPlatformStatus(String platformStatus) {
+        this.platformStatus = platformStatus;
+    }
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
     }
 }

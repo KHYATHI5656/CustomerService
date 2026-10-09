@@ -3,6 +3,7 @@ package com.alpha.CustomerService.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,9 +59,25 @@ public class customercontroller {
 
 		     return "Temporary ride saved successfully";
 		 }
+
 		 @GetMapping("/booking/{bookingId}")
 		 public booking getBooking(@PathVariable int bookingId) {
 		     return customerService.getBookingById(bookingId);
+		 }
+		 @PostMapping("/customer/cancelRide/{bookingId}")
+		 public ResponseEntity<?> cancelRide(@PathVariable int bookingId) {
+
+		     String response = customerService.cancelRide(bookingId);
+
+		     return ResponseEntity.ok(response);
+		 }
+		 @GetMapping("/ridehistory")
+		 public List<booking> rideHistory(
+		         @RequestParam int customerId,
+		         @RequestParam String status) {
+
+		     return customerService.rideHistory(customerId, status);
+
 		 }
 
 }
